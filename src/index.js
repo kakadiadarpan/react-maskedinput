@@ -65,7 +65,8 @@ var MaskedInput = React.createClass({
     placeholderChar: React.PropTypes.string,
 
     isRevealingMask: React.PropTypes.bool,
-    backspaceSkipsStatic: React.PropTypes.bool
+    backspaceSkipsStatic: React.PropTypes.bool,
+    reference: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -267,14 +268,28 @@ var MaskedInput = React.createClass({
   },
 
   render() {
-    var ref = r => this.input = r
     var maxLength = this.mask.pattern.length
     var value = this._getDisplayValue()
     var eventHandlers = this._getEventHandlers()
     var { size = maxLength, placeholder = this.mask.emptyValue } = this.props
-
-    var {placeholderChar, formatCharacters, isRevealingMask, backspaceSkipsStatic, ...cleanedProps} = this.props
-    var inputProps = { ...cleanedProps, ...eventHandlers, ref, maxLength, value, size, placeholder }
+    var { reference, placeholderChar, formatCharacters, isRevealingMask, backspaceSkipsStatic, ...cleanedProps } = this.props
+    var ref = r => {
+      if(r){
+        r.mask = this.mask
+        this.input = r
+        if(reference)
+          reference(r);
+      }
+    }
+    var inputProps = {
+      ...cleanedProps,
+      ...eventHandlers,
+      ref,
+      maxLength,
+      value,
+      size,
+      placeholder
+    }
     return <input {...inputProps} />
   }
 
